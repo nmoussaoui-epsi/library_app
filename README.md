@@ -73,7 +73,7 @@ CREATE TABLE emprunts (
 );
 ```
 
-## 🏃‍♂️ Démarrage
+## Démarrage
 
 ### Mode développement
 
