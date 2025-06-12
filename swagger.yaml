@@ -2,28 +2,675 @@ openapi: 3.0.0
 info:
   title: Médiathèque API
   version: 1.0.0
-  description: API pour gérer une médiathèque
+  description: |
+    API REST pour gérer une médiathèque avec des utilisateurs, des ressources et des emprunts.
+
+    ## Fonctionnalités
+    - Gestion des utilisateurs
+    - Gestion des ressources (livres, DVDs, etc.)
+    - Système d'emprunts et de retours
+
+    ## Authentification
+    Aucune authentification requise pour cette version de développement.
+
 servers:
   - url: http://localhost:3000
+    description: Serveur de développement
+
+tags:
+  - name: Users
+    description: Gestion des utilisateurs
+  - name: Resources
+    description: Gestion des ressources
+  - name: Emprunts
+    description: Gestion des emprunts
 
 paths:
+  # === USERS ===
   /api/users:
     get:
+      tags:
+        - Users
       summary: Liste tous les utilisateurs
+      description: Récupère la liste complète des utilisateurs enregistrés
       responses:
         "200":
-          description: Liste d'utilisateurs
+          description: Liste d'utilisateurs récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
+    post:
+      tags:
+        - Users
+      summary: Crée un nouvel utilisateur
+      description: Ajoute un nouvel utilisateur à la médiathèque
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+            example:
+              nom: "Dupont"
+              prenom: "Jean"
+              email: "jean.dupont@email.com"
+              phone: "0123456789"
+              nationalite: "Française"
+      responses:
+        "201":
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/users/{uuid}:
+    get:
+      tags:
+        - Users
+      summary: Récupère un utilisateur par UUID
+      description: Récupère les détails d'un utilisateur spécifique
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      responses:
+        "200":
+          description: Utilisateur trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    put:
+      tags:
+        - Users
+      summary: Met à jour un utilisateur
+      description: Modifie les informations d'un utilisateur existant
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Utilisateur mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    delete:
+      tags:
+        - Users
+      summary: Supprime un utilisateur
+      description: Supprime définitivement un utilisateur de la base de données
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      responses:
+        "204":
+          description: Utilisateur supprimé avec succès
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  # === RESOURCES ===
   /api/resources:
     get:
+      tags:
+        - Resources
       summary: Liste toutes les ressources
+      description: Récupère la liste complète des ressources disponibles
+      parameters:
+        - name: type
+          in: query
+          description: Filtrer par type de ressource
+          required: false
+          schema:
+            type: string
+            enum: [livre, dvd, cd, magazine]
+        - name: disponible
+          in: query
+          description: Filtrer par disponibilité
+          required: false
+          schema:
+            type: boolean
       responses:
         "200":
-          description: Liste de ressources
+          description: Liste des ressources récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Resource"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
+    post:
+      tags:
+        - Resources
+      summary: Crée une nouvelle ressource
+      description: Ajoute une nouvelle ressource à la médiathèque
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResourceCreate"
+            example:
+              titre: "Le Petit Prince"
+              type: "livre"
+              auteur: "Antoine de Saint-Exupéry"
+              disponible: true
+      responses:
+        "201":
+          description: Ressource créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resource"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/resources/{uuid}:
+    get:
+      tags:
+        - Resources
+      summary: Récupère une ressource par UUID
+      description: Récupère les détails d'une ressource spécifique
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      responses:
+        "200":
+          description: Ressource trouvée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resource"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    put:
+      tags:
+        - Resources
+      summary: Met à jour une ressource
+      description: Modifie les informations d'une ressource existante
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResourceUpdate"
+      responses:
+        "200":
+          description: Ressource mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resource"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    delete:
+      tags:
+        - Resources
+      summary: Supprime une ressource
+      description: Supprime définitivement une ressource de la base de données
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      responses:
+        "204":
+          description: Ressource supprimée avec succès
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  # === EMPRUNTS ===
   /api/emprunts:
     get:
+      tags:
+        - Emprunts
       summary: Liste tous les emprunts
+      description: Récupère la liste complète des emprunts
+      parameters:
+        - name: utilisateur_id
+          in: query
+          description: Filtrer par utilisateur
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: ressource_id
+          in: query
+          description: Filtrer par ressource
+          required: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
-          description: Liste d'emprunts
+          description: Liste des emprunts récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Emprunt"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    post:
+      tags:
+        - Emprunts
+      summary: Crée un nouvel emprunt
+      description: Enregistre un nouvel emprunt de ressource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmpruntCreate"
+            example:
+              utilisateur_id: "550e8400-e29b-41d4-a716-446655440000"
+              ressource_id: "550e8400-e29b-41d4-a716-446655440001"
+              date_emprunt: "2025-06-12"
+              date_retour: "2025-07-12"
+      responses:
+        "201":
+          description: Emprunt créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Emprunt"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/emprunts/{uuid}:
+    get:
+      tags:
+        - Emprunts
+      summary: Récupère un emprunt par UUID
+      description: Récupère les détails d'un emprunt spécifique
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      responses:
+        "200":
+          description: Emprunt trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Emprunt"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+    delete:
+      tags:
+        - Emprunts
+      summary: Restitue une ressource (supprime l'emprunt)
+      description: Marque une ressource comme rendue en supprimant l'emprunt
+      parameters:
+        - $ref: "#/components/parameters/UUID"
+      responses:
+        "204":
+          description: Ressource restituée avec succès
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+components:
+  parameters:
+    UUID:
+      name: uuid
+      in: path
+      required: true
+      description: Identifiant unique UUID
+      schema:
+        type: string
+        format: uuid
+        example: "550e8400-e29b-41d4-a716-446655440000"
+
+  schemas:
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Identifiant unique de l'utilisateur
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        nom:
+          type: string
+          maxLength: 100
+          description: Nom de famille
+          example: "Dupont"
+        prenom:
+          type: string
+          maxLength: 100
+          description: Prénom
+          example: "Jean"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: Adresse email (unique)
+          example: "jean.dupont@email.com"
+        phone:
+          type: string
+          maxLength: 20
+          description: Numéro de téléphone
+          example: "0123456789"
+        nationalite:
+          type: string
+          maxLength: 100
+          description: Nationalité
+          example: "Française"
+      required:
+        - uuid
+        - nom
+        - prenom
+        - email
+
+    UserCreate:
+      type: object
+      properties:
+        nom:
+          type: string
+          maxLength: 100
+          description: Nom de famille
+          example: "Dupont"
+        prenom:
+          type: string
+          maxLength: 100
+          description: Prénom
+          example: "Jean"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: Adresse email (unique)
+          example: "jean.dupont@email.com"
+        phone:
+          type: string
+          maxLength: 20
+          description: Numéro de téléphone
+          example: "0123456789"
+        nationalite:
+          type: string
+          maxLength: 100
+          description: Nationalité
+          example: "Française"
+      required:
+        - nom
+        - prenom
+        - email
+
+    UserUpdate:
+      type: object
+      properties:
+        nom:
+          type: string
+          maxLength: 100
+          description: Nom de famille
+        prenom:
+          type: string
+          maxLength: 100
+          description: Prénom
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: Adresse email (unique)
+        phone:
+          type: string
+          maxLength: 20
+          description: Numéro de téléphone
+        nationalite:
+          type: string
+          maxLength: 100
+          description: Nationalité
+
+    Resource:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Identifiant unique de la ressource
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        titre:
+          type: string
+          maxLength: 255
+          description: Titre de la ressource
+          example: "Le Petit Prince"
+        type:
+          type: string
+          maxLength: 50
+          enum: [livre, dvd, cd, magazine]
+          description: Type de ressource
+          example: "livre"
+        auteur:
+          type: string
+          maxLength: 255
+          description: Auteur ou créateur
+          example: "Antoine de Saint-Exupéry"
+        disponible:
+          type: boolean
+          description: Disponibilité de la ressource
+          example: true
+      required:
+        - uuid
+        - titre
+        - type
+
+    ResourceCreate:
+      type: object
+      properties:
+        titre:
+          type: string
+          maxLength: 255
+          description: Titre de la ressource
+          example: "Le Petit Prince"
+        type:
+          type: string
+          maxLength: 50
+          enum: [livre, dvd, cd, magazine]
+          description: Type de ressource
+          example: "livre"
+        auteur:
+          type: string
+          maxLength: 255
+          description: Auteur ou créateur
+          example: "Antoine de Saint-Exupéry"
+        disponible:
+          type: boolean
+          description: Disponibilité de la ressource
+          default: true
+          example: true
+      required:
+        - titre
+        - type
+
+    ResourceUpdate:
+      type: object
+      properties:
+        titre:
+          type: string
+          maxLength: 255
+          description: Titre de la ressource
+        type:
+          type: string
+          maxLength: 50
+          enum: [livre, dvd, cd, magazine]
+          description: Type de ressource
+        auteur:
+          type: string
+          maxLength: 255
+          description: Auteur ou créateur
+        disponible:
+          type: boolean
+          description: Disponibilité de la ressource
+
+    Emprunt:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Identifiant unique de l'emprunt
+          example: "550e8400-e29b-41d4-a716-446655440002"
+        utilisateur_id:
+          type: string
+          format: uuid
+          description: UUID de l'utilisateur
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        ressource_id:
+          type: string
+          format: uuid
+          description: UUID de la ressource
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        date_emprunt:
+          type: string
+          format: date
+          description: Date d'emprunt
+          example: "2025-06-12"
+        date_retour:
+          type: string
+          format: date
+          description: Date de retour prévue
+          example: "2025-07-12"
+      required:
+        - uuid
+        - utilisateur_id
+        - ressource_id
+        - date_emprunt
+        - date_retour
+
+    EmpruntCreate:
+      type: object
+      properties:
+        utilisateur_id:
+          type: string
+          format: uuid
+          description: UUID de l'utilisateur
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        ressource_id:
+          type: string
+          format: uuid
+          description: UUID de la ressource
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        date_emprunt:
+          type: string
+          format: date
+          description: Date d'emprunt
+          example: "2025-06-12"
+        date_retour:
+          type: string
+          format: date
+          description: Date de retour prévue
+          example: "2025-07-12"
+      required:
+        - utilisateur_id
+        - ressource_id
+        - date_emprunt
+        - date_retour
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Message d'erreur
+          example: "Ressource non trouvée"
+        message:
+          type: string
+          description: Détails supplémentaires
+          example: "L'UUID fourni ne correspond à aucune ressource"
+        code:
+          type: string
+          description: Code d'erreur
+          example: "RESOURCE_NOT_FOUND"
+
+  responses:
+    NotFound:
+      description: Ressource non trouvée
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Ressource non trouvée"
+            message: "L'UUID fourni ne correspond à aucune ressource"
+            code: "NOT_FOUND"
+
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Données invalides"
+            message: "L'UUID fourni n'est pas au bon format"
+            code: "INVALID_UUID"
+
+    ServerError:
+      description: Erreur interne du serveur
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Erreur interne"
+            message: "Une erreur inattendue s'est produite"
+            code: "INTERNAL_ERROR"
