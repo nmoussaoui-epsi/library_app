@@ -1,5 +1,4 @@
 require('dotenv').config();
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD); // <== à ajouter
 
 const knex = require('knex')({
   client: 'pg',
