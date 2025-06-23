@@ -1,38 +1,39 @@
-# Library App - API de Médiathèque
+# Library App – API de Médiathèque
 
-Une API REST pour gérer une médiathèque avec des utilisateurs, des ressources et des emprunts.
+API REST pour gérer une médiathèque : utilisateurs, ressources, emprunts.
 
-## Technologies utilisées
+## Technologies
 
-- **Node.js** avec Express.js
-- **PostgreSQL** pour la base de données
-- **Swagger** pour la documentation API
-- **CORS** pour les requêtes cross-origin
+- **Node.js** + **Express**
+- **PostgreSQL**
+- **Knex.js** (migrations et requêtes SQL)
+- **Swagger** (documentation)
+- **CORS** (requêtes cross-origin)
 
 ## Prérequis
 
-- Node.js (version 14 ou supérieure)
+- Node.js ≥ 14
 - PostgreSQL
 - npm ou yarn
 
 ## Installation
 
-1. **Cloner le projet**
+### 1. Cloner le dépôt
 
 ```bash
 git clone https://github.com/nmoussaoui-epsi/library_app
 cd library_app
 ```
 
-2. **Installer les dépendances**
+### 2. Installer les dépendances
 
 ```bash
 npm install
 ```
 
-3. **Configuration de la base de données**
-   - Créer une base de données PostgreSQL nommée `library_app`
-   - Configurer le fichier `.env` avec vos paramètres :
+### 3. Configurer la base de données
+
+Créer un fichier `.env` avec les informations suivantes :
 
 ```env
 DB_HOST=localhost
@@ -42,38 +43,17 @@ DB_PASSWORD=votre_mot_de_passe
 DB_NAME=library_app
 ```
 
-4. **Créer les tables** (à faire manuellement dans PostgreSQL)
+Créer la base PostgreSQL nommée `library_app`.
 
-```sql
-CREATE TABLE users (
-  uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nom VARCHAR(100) NOT NULL,
-  prenom VARCHAR(100) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  phone VARCHAR(20),
-  nationalite VARCHAR(100)
-);
+### 4. Appliquer les migrations
 
-CREATE TABLE ressources (
-  uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  titre VARCHAR(255) NOT NULL,
-  type VARCHAR(50) NOT NULL,
-  auteur VARCHAR(255),
-  disponible BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE emprunts (
-  uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  utilisateur_id UUID NOT NULL,
-  ressource_id UUID NOT NULL,
-  date_emprunt DATE NOT NULL,
-  date_retour DATE NOT NULL,
-  CONSTRAINT fk_utilisateur FOREIGN KEY (utilisateur_id) REFERENCES users(uuid),
-  CONSTRAINT fk_ressource FOREIGN KEY (ressource_id) REFERENCES ressources(uuid)
-);
+```bash
+npx knex migrate:latest
 ```
 
-## Démarrage
+Les tables seront automatiquement créées via les fichiers de migration. La colonne `id` est une UUID générée automatiquement.
+
+## Lancer l'application
 
 ### Mode développement
 
@@ -87,45 +67,45 @@ npm run dev
 npm start
 ```
 
-Le serveur démarre sur `http://localhost:3000`
+L'application sera accessible à : `http://localhost:3000`
 
 ## Documentation API
 
-La documentation Swagger est disponible à : `http://localhost:3000/api-docs`
+Disponible à : `http://localhost:3000/api-docs`
 
-## Endpoints principaux
+## Endpoints
 
 ### Utilisateurs
 
-- `GET /api/users` - Liste tous les utilisateurs
-- `GET /api/users/:uuid` - Récupère un utilisateur par UUID
-- `POST /api/users` - Crée un nouvel utilisateur
-- `PUT /api/users/:uuid` - Met à jour un utilisateur
-- `DELETE /api/users/:uuid` - Supprime un utilisateur
+- `GET /api/users` – Liste des utilisateurs
+- `GET /api/users/:id` – Détail d’un utilisateur
+- `POST /api/users` – Création
+- `PUT /api/users/:id` – Mise à jour
+- `DELETE /api/users/:id` – Suppression
 
 ### Ressources
 
-- `GET /api/resources` - Liste toutes les ressources
-- `GET /api/resources/:uuid` - Récupère une ressource par UUID
-- `POST /api/resources` - Crée une nouvelle ressource
-- `PUT /api/resources/:uuid` - Met à jour une ressource
-- `DELETE /api/resources/:uuid` - Supprime une ressource
+- `GET /api/resources` – Liste des ressources
+- `GET /api/resources/:id` – Détail
+- `POST /api/resources` – Création
+- `PUT /api/resources/:id` – Mise à jour
+- `DELETE /api/resources/:id` – Suppression
 
 ### Emprunts
 
-- `GET /api/emprunts` - Liste tous les emprunts
-- `GET /api/emprunts/:uuid` - Récupère un emprunt par UUID
-- `POST /api/emprunts` - Crée un nouvel emprunt
-- `DELETE /api/emprunts/:uuid` - Restitue une ressource
+- `GET /api/emprunts` – Liste des emprunts
+- `GET /api/emprunts/:id` – Détail
+- `POST /api/emprunts` – Création
+- `DELETE /api/emprunts/:id` – Restitution
 
 ## Structure du projet
 
 ```
 src/
+├── app.js           # Configuration Express
+├── server.js        # Point d’entrée
 ├── controllers/     # Logique métier
-├── models/         # Modèles de données et requêtes DB
-├── routes/         # Définition des routes
-├── services/       # Services (vide pour l'instant)
-├── app.js         # Configuration Express
-└── server.js      # Point d'entrée du serveur
+├── models/          # Accès base de données (Knex)
+├── routes/          # Définition des routes
+└── services/        # Services (actuellement vide)
 ```
