@@ -74,14 +74,14 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
-  /api/users/{uuid}:
+  /api/users/{id}:
     get:
       tags:
         - Users
-      summary: Récupère un utilisateur par UUID
+      summary: Récupère un utilisateur par ID
       description: Récupère les détails d'un utilisateur spécifique
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       responses:
         "200":
           description: Utilisateur trouvé
@@ -102,7 +102,7 @@ paths:
       summary: Met à jour un utilisateur
       description: Modifie les informations d'un utilisateur existant
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       requestBody:
         required: true
         content:
@@ -129,7 +129,7 @@ paths:
       summary: Supprime un utilisateur
       description: Supprime définitivement un utilisateur de la base de données
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       responses:
         "204":
           description: Utilisateur supprimé avec succès
@@ -201,14 +201,14 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
-  /api/resources/{uuid}:
+  /api/resources/{id}:
     get:
       tags:
         - Resources
-      summary: Récupère une ressource par UUID
+      summary: Récupère une ressource par ID
       description: Récupère les détails d'une ressource spécifique
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       responses:
         "200":
           description: Ressource trouvée
@@ -229,7 +229,7 @@ paths:
       summary: Met à jour une ressource
       description: Modifie les informations d'une ressource existante
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       requestBody:
         required: true
         content:
@@ -256,7 +256,7 @@ paths:
       summary: Supprime une ressource
       description: Supprime définitivement une ressource de la base de données
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       responses:
         "204":
           description: Ressource supprimée avec succès
@@ -329,14 +329,14 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
-  /api/emprunts/{uuid}:
+  /api/emprunts/{id}:
     get:
       tags:
         - Emprunts
-      summary: Récupère un emprunt par UUID
+      summary: Récupère un emprunt par ID
       description: Récupère les détails d'un emprunt spécifique
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       responses:
         "200":
           description: Emprunt trouvé
@@ -357,7 +357,7 @@ paths:
       summary: Restitue une ressource (supprime l'emprunt)
       description: Marque une ressource comme rendue en supprimant l'emprunt
       parameters:
-        - $ref: "#/components/parameters/UUID"
+        - $ref: "#/components/parameters/id"
       responses:
         "204":
           description: Ressource restituée avec succès
@@ -370,11 +370,11 @@ paths:
 
 components:
   parameters:
-    UUID:
-      name: uuid
+    id:
+      name: id
       in: path
       required: true
-      description: Identifiant unique UUID
+      description: identifiant unique id
       schema:
         type: string
         format: uuid
@@ -384,7 +384,7 @@ components:
     User:
       type: object
       properties:
-        uuid:
+        id:
           type: string
           format: uuid
           description: Identifiant unique de l'utilisateur
@@ -416,7 +416,7 @@ components:
           description: Nationalité
           example: "Française"
       required:
-        - uuid
+        - id
         - nom
         - prenom
         - email
@@ -483,7 +483,7 @@ components:
     Resource:
       type: object
       properties:
-        uuid:
+        id:
           type: string
           format: uuid
           description: Identifiant unique de la ressource
@@ -509,7 +509,7 @@ components:
           description: Disponibilité de la ressource
           example: true
       required:
-        - uuid
+        - id
         - titre
         - type
 
@@ -564,7 +564,7 @@ components:
     Emprunt:
       type: object
       properties:
-        uuid:
+        id:
           type: string
           format: uuid
           description: Identifiant unique de l'emprunt
@@ -572,12 +572,12 @@ components:
         utilisateur_id:
           type: string
           format: uuid
-          description: UUID de l'utilisateur
+          description: ID de l'utilisateur
           example: "550e8400-e29b-41d4-a716-446655440000"
         ressource_id:
           type: string
           format: uuid
-          description: UUID de la ressource
+          description: ID de la ressource
           example: "550e8400-e29b-41d4-a716-446655440001"
         date_emprunt:
           type: string
@@ -590,7 +590,7 @@ components:
           description: Date de retour prévue
           example: "2025-07-12"
       required:
-        - uuid
+        - id
         - utilisateur_id
         - ressource_id
         - date_emprunt
@@ -602,12 +602,12 @@ components:
         utilisateur_id:
           type: string
           format: uuid
-          description: UUID de l'utilisateur
+          description: ID de l'utilisateur
           example: "550e8400-e29b-41d4-a716-446655440000"
         ressource_id:
           type: string
           format: uuid
-          description: UUID de la ressource
+          description: ID de la ressource
           example: "550e8400-e29b-41d4-a716-446655440001"
         date_emprunt:
           type: string
@@ -635,7 +635,7 @@ components:
         message:
           type: string
           description: Détails supplémentaires
-          example: "L'UUID fourni ne correspond à aucune ressource"
+          example: "L'ID fourni ne correspond à aucune ressource"
         code:
           type: string
           description: Code d'erreur
@@ -650,7 +650,7 @@ components:
             $ref: "#/components/schemas/Error"
           example:
             error: "Ressource non trouvée"
-            message: "L'UUID fourni ne correspond à aucune ressource"
+            message: "L'ID fourni ne correspond à aucune ressource"
             code: "NOT_FOUND"
 
     BadRequest:
@@ -661,8 +661,8 @@ components:
             $ref: "#/components/schemas/Error"
           example:
             error: "Données invalides"
-            message: "L'UUID fourni n'est pas au bon format"
-            code: "INVALID_UUID"
+            message: "L'ID fourni n'est pas au bon format"
+            code: "INVALID_ID"
 
     ServerError:
       description: Erreur interne du serveur

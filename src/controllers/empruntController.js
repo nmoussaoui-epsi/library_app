@@ -1,29 +1,43 @@
-const empruntService = require("../models/empruntModel");
 
-exports.getAll = async (req, res) => {
-  const emprunts = await empruntService.getAllEmprunts();
-  res.json(emprunts);
+const { empruntSchema } = require('../models/empruntModel');
+const empruntService = require('../services/empruntService');
+
+const getAllEmprunts = async (req, res) => {
+  try {
+    const emprunts = await empruntService.getAllEmprunts();
+    res.json(emprunts);
+  } catch (error) {
+    console.error('Erreur getAllEmprunts:', error);
+    res.status(500).json({ message: 'Une erreur est survenue.' });
+  }
 };
 
-exports.getById = async (req, res) => {
-  const emprunt = await empruntService.getEmpruntById(req.params.uuid);
-  if (!emprunt) return res.status(404).json({ error: "Emprunt non trouvé" });
-  res.json(emprunt);
+const createEmprunt = async (req, res) => {
+  try {
+    const { error } = empruntSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const newEmprunt = await empruntService.createEmprunt(req.body);
+    res.status(201).json(newEmprunt);
+  } catch (error) {
+    console.error('Erreur createEmprunt:', error);
+    res.status(500).json({ message: 'Une erreur est survenue.' });
+  }
 };
 
-exports.create = async (req, res) => {
-  const { utilisateur_id, ressource_id, date_emprunt, date_retour } = req.body;
-  const created = await empruntService.createEmprunt({
-    utilisateur_id,
-    ressource_id,
-    date_emprunt,
-    date_retour,
-  });
-  res.status(201).json(created);
+const deleteEmprunt = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await empruntService.deleteEmprunt(id);
+    res.json({ message: 'Emprunt supprimé avec succès.' });
+  } catch (error) {
+    console.error('Erreur deleteEmprunt:', error);
+    res.status(500).json({ message: 'Une erreur est survenue.' });
+  }
 };
 
-exports.restituer = async (req, res) => {
-  const emprunt = await empruntService.restituerEmprunt(req.params.uuid);
-  if (!emprunt) return res.status(404).json({ error: "Emprunt non trouvé" });
-  res.status(200).json({ message: "Ressource restituée avec succès" });
+module.exports = {
+  getAllEmprunts,
+  createEmprunt,
+  deleteEmprunt
 };
