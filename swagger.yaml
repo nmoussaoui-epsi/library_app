@@ -81,7 +81,7 @@ paths:
       summary: Récupère un utilisateur par ID
       description: Récupère les détails d'un utilisateur spécifique
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       responses:
         "200":
           description: Utilisateur trouvé
@@ -102,7 +102,7 @@ paths:
       summary: Met à jour un utilisateur
       description: Modifie les informations d'un utilisateur existant
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       requestBody:
         required: true
         content:
@@ -129,7 +129,7 @@ paths:
       summary: Supprime un utilisateur
       description: Supprime définitivement un utilisateur de la base de données
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       responses:
         "204":
           description: Utilisateur supprimé avec succès
@@ -208,7 +208,7 @@ paths:
       summary: Récupère une ressource par ID
       description: Récupère les détails d'une ressource spécifique
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       responses:
         "200":
           description: Ressource trouvée
@@ -229,7 +229,7 @@ paths:
       summary: Met à jour une ressource
       description: Modifie les informations d'une ressource existante
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       requestBody:
         required: true
         content:
@@ -256,7 +256,7 @@ paths:
       summary: Supprime une ressource
       description: Supprime définitivement une ressource de la base de données
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       responses:
         "204":
           description: Ressource supprimée avec succès
@@ -336,7 +336,7 @@ paths:
       summary: Récupère un emprunt par ID
       description: Récupère les détails d'un emprunt spécifique
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       responses:
         "200":
           description: Emprunt trouvé
@@ -357,7 +357,7 @@ paths:
       summary: Restitue une ressource (supprime l'emprunt)
       description: Marque une ressource comme rendue en supprimant l'emprunt
       parameters:
-        - $ref: "#/components/parameters/ID"
+        - $ref: "#/components/parameters/id"
       responses:
         "204":
           description: Ressource restituée avec succès
@@ -374,7 +374,7 @@ components:
       name: id
       in: path
       required: true
-      description: Identifiant unique ID
+      description: identifiant unique id
       schema:
         type: string
         format: uuid
